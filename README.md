@@ -1,11 +1,11 @@
 # HappyChina Mining Pool - Windows
 
-Multi-coin SHA-256 + Scrypt mining pool with merge mining. One-click launcher for Windows.
+Multi-coin Scrypt mining pool with merge mining. One-click launcher for Windows.
 
 ## Prerequisites
 
 - [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) (free)
-- ~1.75TB disk space for full blockchain sync
+- ~900GB disk space for full blockchain sync
 
 ## One-Click Start
 
@@ -52,11 +52,12 @@ Double-click **`Stop-HappyChinaPool.bat`**
 
 | Port | Algorithm | Primary Coin | Merge-Mined Coins |
 |------|-----------|-------------|-------------------|
-| 3342 | SHA-256   | Bitcoin (BTC) | Namecoin (NMC) |
 | 3333 | Scrypt    | Litecoin (LTC) | DOGE, PEPE, BELLS, LKY, JKC, DINGO, SHIC, TRMP |
 
+Additional ports:
+- **3344**: Low difficulty (CPU/GPU miners)
+
 Connect your miners:
-- **SHA-256 ASICs**: `stratum+tcp://YOUR_PC_IP:3342`
 - **Scrypt ASICs**: `stratum+tcp://YOUR_PC_IP:3333`
 
 Use your wallet address as the username.
@@ -68,11 +69,7 @@ Use your wallet address as the username.
 3. Set wallet addresses in your profile
 4. Connect your miners!
 
-## Supported Coins (11 total)
-
-### SHA-256 (port 3342)
-- **Bitcoin (BTC)** — primary chain
-- **Namecoin (NMC)** — merge-mined with BTC
+## Supported Coins (9 total)
 
 ### Scrypt (port 3333)
 - **Litecoin (LTC)** — primary chain

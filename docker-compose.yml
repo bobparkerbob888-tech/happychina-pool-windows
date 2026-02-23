@@ -1,7 +1,7 @@
 services:
   # === Backend API (Node.js + SQLite) ===
   backend:
-    image: ghcr.io/bobparkerbob888-tech/happychina-pool-backend:2.0.0
+    image: ghcr.io/bobparkerbob888-tech/happychina-pool-backend:2.1.0
     restart: unless-stopped
     environment:
       PORT: '8080'
@@ -59,7 +59,7 @@ services:
       - frontend-build:/frontend/build:ro
     ports:
       - '8080:8080'
-      - '3333-3343:3333-3343'
+      - '3332-3344:3332-3344'
     depends_on:
       init:
         condition: service_completed_successfully
@@ -70,7 +70,7 @@ services:
 
   # === Init: fix permissions + copy frontend build ===
   init:
-    image: ghcr.io/bobparkerbob888-tech/happychina-pool-frontend:2.0.0
+    image: ghcr.io/bobparkerbob888-tech/happychina-pool-frontend:2.1.0
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -87,7 +87,7 @@ services:
 
   # === Frontend (React + Nginx) ===
   frontend:
-    image: ghcr.io/bobparkerbob888-tech/happychina-pool-frontend:2.0.0
+    image: ghcr.io/bobparkerbob888-tech/happychina-pool-frontend:2.1.0
     restart: unless-stopped
     depends_on:
       - backend

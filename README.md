@@ -37,6 +37,9 @@ If you see **"Windows protected your PC"** or **"This app can't run on your PC"*
 The launcher will:
 - Check if Docker Desktop is installed (opens download page if not)
 - Start Docker Desktop if it's not running
+- **Auto-detect** your system's CPU, RAM, and disk space
+- **Auto-tune** dbcache per daemon based on your RAM for fastest sync
+- Set **unlimited peer connections** for all daemons
 - Create all data directories
 - Pull and start all containers
 - Open http://localhost:8080 in your browser

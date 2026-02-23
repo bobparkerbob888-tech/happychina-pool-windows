@@ -1,4 +1,4 @@
-# HappyChina Mining Pool - Windows PowerShell Launcher
+# HappyChina Mining Pool - Windows PowerShell Launcher (Smart Auto-Tuning)
 # Right-click this file and select "Run with PowerShell"
 
 Write-Host "============================================" -ForegroundColor Green
@@ -35,12 +35,55 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "[OK] Docker is running" -ForegroundColor Green
 Write-Host ""
 
+# Detect system resources
+$totalRAM_MB = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1MB)
+$cpuCores = (Get-CimInstance Win32_Processor).NumberOfLogicalProcessors
+$diskFree_GB = [math]::Round((Get-PSDrive C).Free / 1GB)
+
+Write-Host "System detected:" -ForegroundColor Cyan
+Write-Host "   CPU: $cpuCores cores"
+Write-Host "   RAM: $totalRAM_MB MB"
+Write-Host "   Disk: $diskFree_GB GB free"
+Write-Host ""
+
+# Calculate optimal dbcache based on available RAM
+$availableRAM = $totalRAM_MB - 4096
+if ($availableRAM -lt 2048) { $availableRAM = 2048 }
+
+$btcCache = [math]::Min(16384, [math]::Max(512, [math]::Floor($availableRAM * 0.30)))
+$dogeCache = [math]::Min(8192, [math]::Max(512, [math]::Floor($availableRAM * 0.20)))
+$ltcCache = [math]::Min(8192, [math]::Max(512, [math]::Floor($availableRAM * 0.15)))
+$nmcCache = [math]::Min(4096, [math]::Max(256, [math]::Floor($availableRAM * 0.10)))
+$smallCache = [math]::Min(2048, [math]::Max(256, [math]::Floor($availableRAM * 0.25 / 7)))
+
+Write-Host "Optimized dbcache allocation:" -ForegroundColor Cyan
+Write-Host "   Bitcoin:  $btcCache MB"
+Write-Host "   Litecoin: $ltcCache MB"
+Write-Host "   Dogecoin: $dogeCache MB"
+Write-Host "   Namecoin: $nmcCache MB"
+Write-Host "   Others:   $smallCache MB each"
+Write-Host ""
+
 # Create data directories
 Write-Host "Creating data directories..."
 $coins = @("bitcoin","litecoin","dogecoin","namecoin","pepecoin","bells","luckycoin","junkcoin","dingocoin","shibacoin","trumpow","pool")
 foreach ($coin in $coins) {
     $dir = Join-Path $PSScriptRoot "data\$coin"
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+}
+
+# Apply optimized settings to docker-compose.yml
+Write-Host "Applying optimized settings..." -ForegroundColor Cyan
+$composeFile = Join-Path $PSScriptRoot "docker-compose.yml"
+if (Test-Path $composeFile) {
+    $content = Get-Content $composeFile -Raw
+    $content = $content -replace '-dbcache=8192', "-dbcache=$btcCache"
+    $content = $content -replace '-dbcache=4096', "-dbcache=$dogeCache"
+    $content = $content -replace '-dbcache=3072', "-dbcache=$smallCache"
+    $content = $content -replace '-dbcache=512', "-dbcache=$smallCache"
+    $content = $content -replace '-maxconnections=1000', '-maxconnections=0'
+    Set-Content $composeFile $content
+    Write-Host "[OK] Settings optimized for your system" -ForegroundColor Green
 }
 
 # Start the pool
@@ -67,6 +110,11 @@ Write-Host ""
 Write-Host "  Web Dashboard: " -NoNewline; Write-Host "http://localhost:8080" -ForegroundColor Cyan
 Write-Host "  SHA-256 Stratum: stratum+tcp://localhost:3342"
 Write-Host "  Scrypt Stratum:  stratum+tcp://localhost:3333"
+Write-Host ""
+Write-Host "  Optimized for your system:" -ForegroundColor Yellow
+Write-Host "     $cpuCores CPU cores, ${totalRAM_MB}MB RAM"
+Write-Host "     Unlimited peer connections"
+Write-Host "     Auto-tuned dbcache per daemon"
 Write-Host ""
 Write-Host "  First Steps:"
 Write-Host "  1. Open http://localhost:8080 in your browser"

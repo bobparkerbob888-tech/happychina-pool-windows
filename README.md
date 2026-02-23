@@ -13,6 +13,27 @@ Multi-coin SHA-256 + Scrypt mining pool with merge mining. One-click launcher fo
 2. Double-click **`Start-HappyChinaPool.bat`**
 3. That's it! Your browser will open to the dashboard automatically
 
+### ⚠️ Windows SmartScreen Warning
+
+If you see **"Windows protected your PC"** or **"This app can't run on your PC"**:
+
+**Option A - Unblock the .bat file:**
+1. Right-click `Start-HappyChinaPool.bat`
+2. Click **Properties**
+3. At the bottom, check **"Unblock"**
+4. Click **OK**
+5. Double-click the .bat file again
+
+**Option B - Use PowerShell instead:**
+1. Right-click `Start-HappyChinaPool.ps1`
+2. Select **"Run with PowerShell"**
+3. If prompted about execution policy, type `Y` and press Enter
+
+**Option C - Run from Command Prompt:**
+1. Open Command Prompt (Win+R → `cmd` → Enter)
+2. Navigate to the extracted folder: `cd C:\Users\YourName\Downloads\happychina-pool-windows-main`
+3. Run: `Start-HappyChinaPool.bat`
+
 The launcher will:
 - Check if Docker Desktop is installed (opens download page if not)
 - Start Docker Desktop if it's not running

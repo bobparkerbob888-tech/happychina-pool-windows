@@ -10,10 +10,6 @@ services:
       POOL_NAME: 'HappyChina Pool'
       POOL_FEE: '1.0'
       DB_PATH: /app/data/pool.db
-      BTC_RPC_HOST: bitcoind
-      BTC_RPC_PORT: '8332'
-      BTC_RPC_USER: rpcuser
-      BTC_RPC_PASS: rpcpass
       LTC_RPC_HOST: litecoind
       LTC_RPC_PORT: '9332'
       LTC_RPC_USER: rpcuser
@@ -22,10 +18,6 @@ services:
       DOGE_RPC_PORT: '22555'
       DOGE_RPC_USER: rpcuser
       DOGE_RPC_PASS: rpcpass
-      NMC_RPC_HOST: namecoind
-      NMC_RPC_PORT: '8336'
-      NMC_RPC_USER: rpcuser
-      NMC_RPC_PASS: rpcpass
       PEPE_RPC_HOST: pepecoind
       PEPE_RPC_PORT: '29373'
       PEPE_RPC_USER: rpcuser
@@ -63,8 +55,6 @@ services:
     depends_on:
       init:
         condition: service_completed_successfully
-      bitcoind:
-        condition: service_started
       litecoind:
         condition: service_started
 
@@ -77,12 +67,10 @@ services:
         echo "Copying frontend build files..."
         cp -r /usr/share/nginx/html/* /frontend-build/
         echo "Fixing data directory permissions..."
-        chmod -R 777 /data/bitcoin /data/namecoin /data/litecoin 2>/dev/null || true
+        chmod -R 777 /data/litecoin 2>/dev/null || true
         echo "Init complete."
     volumes:
       - frontend-build:/frontend-build
-      - ./data/bitcoin:/data/bitcoin
-      - ./data/namecoin:/data/namecoin
       - ./data/litecoin:/data/litecoin
 
   # === Frontend (React + Nginx) ===
@@ -95,51 +83,6 @@ services:
       - '80:80'
 
   # === Coin Daemons ===
-  bitcoind:
-    image: lncm/bitcoind:v28.0
-    restart: unless-stopped
-    stop_grace_period: 15m
-    volumes:
-      - ./data/bitcoin:/data/.bitcoin
-    command:
-      - '-server=1'
-      - '-rpcuser=rpcuser'
-      - '-rpcpassword=rpcpass'
-      - '-rpcallowip=0.0.0.0/0'
-      - '-rpcbind=0.0.0.0'
-      - '-rpcport=8332'
-      - '-port=8333'
-      - '-txindex=1'
-      - '-printtoconsole'
-      - '-dbcache=8192'
-      - '-maxconnections=1000'
-      - '-par=0'
-      - '-maxmempool=300'
-      - '-rpcworkqueue=128'
-      - '-rpcthreads=8'
-    ports:
-      - '8333:8333'
-
-  namecoind:
-    image: sevenrats/namecoin-core:latest
-    restart: unless-stopped
-    stop_grace_period: 15m
-    volumes:
-      - ./data/namecoin:/home/namecoin/.namecoin
-    command:
-      - namecoind
-      - '-server=1'
-      - '-rpcuser=rpcuser'
-      - '-rpcpassword=rpcpass'
-      - '-rpcallowip=0.0.0.0/0'
-      - '-rpcbind=0.0.0.0'
-      - '-rpcport=8336'
-      - '-port=8334'
-      - '-txindex=1'
-      - '-printtoconsole'
-      - '-dbcache=512'
-      - '-maxconnections=1000'
-
   litecoind:
     image: uphold/litecoin-core:0.21
     restart: unless-stopped

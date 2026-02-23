@@ -61,19 +61,29 @@ services:
       - '8080:8080'
       - '3333-3343:3333-3343'
     depends_on:
-      frontend-init:
+      init:
         condition: service_completed_successfully
       bitcoind:
         condition: service_started
       litecoind:
         condition: service_started
 
-  # === Frontend Build Copier (copies build files to shared volume) ===
-  frontend-init:
+  # === Init: fix permissions + copy frontend build ===
+  init:
     image: ghcr.io/bobparkerbob888-tech/happychina-pool-frontend:2.0.0
-    entrypoint: ["/bin/sh", "-c", "cp -r /usr/share/nginx/html/* /frontend-build/"]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Copying frontend build files..."
+        cp -r /usr/share/nginx/html/* /frontend-build/
+        echo "Fixing data directory permissions..."
+        chmod -R 777 /data/bitcoin /data/namecoin /data/litecoin 2>/dev/null || true
+        echo "Init complete."
     volumes:
       - frontend-build:/frontend-build
+      - ./data/bitcoin:/data/bitcoin
+      - ./data/namecoin:/data/namecoin
+      - ./data/litecoin:/data/litecoin
 
   # === Frontend (React + Nginx) ===
   frontend:

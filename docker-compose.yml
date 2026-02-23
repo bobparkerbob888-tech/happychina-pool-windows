@@ -56,12 +56,24 @@ services:
       TRMP_RPC_PASS: rpcpass
     volumes:
       - ./data/pool:/app/data
+      - frontend-build:/frontend/build:ro
     ports:
       - '8080:8080'
       - '3333-3343:3333-3343'
     depends_on:
-      - bitcoind
-      - litecoind
+      frontend-init:
+        condition: service_completed_successfully
+      bitcoind:
+        condition: service_started
+      litecoind:
+        condition: service_started
+
+  # === Frontend Build Copier (copies build files to shared volume) ===
+  frontend-init:
+    image: ghcr.io/bobparkerbob888-tech/happychina-pool-frontend:2.0.0
+    entrypoint: ["/bin/sh", "-c", "cp -r /usr/share/nginx/html/* /frontend-build/"]
+    volumes:
+      - frontend-build:/frontend-build
 
   # === Frontend (React + Nginx) ===
   frontend:
@@ -314,3 +326,6 @@ services:
       - '-maxconnections=1000'
     ports:
       - '33884:33884'
+
+volumes:
+  frontend-build:

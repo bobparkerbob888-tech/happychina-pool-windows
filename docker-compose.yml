@@ -96,7 +96,7 @@ services:
 
   # === Coin Daemons ===
   bitcoind:
-    image: lncm/bitcoind:v27.2
+    image: lncm/bitcoind:v28.0
     restart: unless-stopped
     stop_grace_period: 15m
     volumes:
@@ -164,7 +164,7 @@ services:
       - '9333:9333'
 
   dogecoind:
-    image: casperstack/dogecoin:latest
+    image: btcpayserver/dogecoin:1.14.9-amd64
     restart: unless-stopped
     stop_grace_period: 15m
     volumes:
@@ -183,6 +183,11 @@ services:
       - '-dbcache=4096'
       - '-maxconnections=1000'
       - '-par=4'
+      - '-addnode=65.108.79.95:22556'
+      - '-addnode=188.40.103.122:22556'
+      - '-addnode=23.88.18.235:22556'
+      - '-addnode=5.9.68.211:22556'
+      - '-addnode=157.173.198.7:22556'
     ports:
       - '22556:22556'
 
